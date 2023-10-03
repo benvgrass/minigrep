@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fs;
+use std::{fs, env};
 
 pub struct QueryConfig<'a> {
     pub query: &'a String,
@@ -12,7 +12,8 @@ impl<'a> QueryConfig<'a> {
         if args.len() < 3 {
             Err("query string and file path expected")
         } else {
-            Ok(QueryConfig {query: &args[1], file_path: &args[2]})
+            Ok(QueryConfig {query: &args[1], file_path: &args[2],
+                case_insensitive: env::var("IGNORE_CASE").is_ok()})
         }
     }
 
