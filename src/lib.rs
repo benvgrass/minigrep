@@ -6,14 +6,12 @@ pub struct QueryConfig<'a> {
     pub file_path: &'a String
 }
 
-impl QueryConfig {
-    pub fn build<'a>(args: &'a[String]) -> Result<QueryConfig, &'static str> {
+impl<'a> QueryConfig<'a> {
+    pub fn build(args: &'a[String]) -> Result<QueryConfig, &'static str> {
         if args.len() < 3 {
             Err("query string and file path expected")
         } else {
-            let query = &args[1];
-            let file_path = &args[2];
-            Ok(QueryConfig {query, file_path})
+            Ok(QueryConfig {query: &args[1], file_path: &args[2]})
         }
     }
 
