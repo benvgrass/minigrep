@@ -3,7 +3,8 @@ use std::fs;
 
 pub struct QueryConfig<'a> {
     pub query: &'a String,
-    pub file_path: &'a String
+    pub file_path: &'a String,
+    pub case_insensitive: bool
 }
 
 impl<'a> QueryConfig<'a> {
@@ -20,7 +21,12 @@ impl<'a> QueryConfig<'a> {
 pub fn run(config: QueryConfig) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
-    for line in search(config.query, &contents) {
+    let results = if config.case_insensitive {
+        search_case_insensitive(config.query, &contents)
+    } else {
+        search(config.query, &contents)
+    };
+    for line in results {
         println!("{line}");
     }
 
