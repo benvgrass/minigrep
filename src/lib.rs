@@ -25,7 +25,13 @@ pub fn run(config: QueryConfig) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    vec![]
+    let mut search_results = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            search_results.push(line);
+        }
+    }
+    search_results
 }
 
 #[cfg(test)]
@@ -34,10 +40,10 @@ mod tests {
     #[test]
     fn one_result() {
         let query = "duct";
-        let contents =
-            "Rust:\
-            safe, fast, productive.\
-            Pick three.";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
