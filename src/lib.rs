@@ -20,7 +20,10 @@ impl<'a> QueryConfig<'a> {
 pub fn run(config: QueryConfig) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
-    println!("File Text:\n{contents}");
+    for line in search(config.query, &contents) {
+        println!("{line}");
+    }
+
     Ok(())
 }
 
