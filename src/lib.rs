@@ -1,20 +1,27 @@
 use std::error::Error;
 use std::{fs, env};
 
-pub struct QueryConfig<'a> {
-    pub query: &'a String,
-    pub file_path: &'a String,
+pub struct QueryConfig {
+    pub query: String,
+    pub file_path: String,
     pub case_insensitive: bool
 }
 
-impl<'a> QueryConfig<'a> {
-    pub fn build(args: &'a[String]) -> Result<QueryConfig, &'static str> {
-        if args.len() < 3 {
-            Err("query string and file path expected")
-        } else {
-            Ok(QueryConfig {query: &args[1], file_path: &args[2],
-                case_insensitive: env::var("IGNORE_CASE").is_ok()})
-        }
+impl QueryConfig {
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<QueryConfig, &'static str> {
+        args.next();
+        let query = match args.next() {
+            Some(q) => q,
+            None => return Err("query not provided")
+        };
+        let file_path = match args.next() {
+            Some(fp) => fp,
+            None => return Err("file path not provided")
+        };
+        let case_insensitive = env::var("IGNORE_CASE").is_ok();
+
+        Ok(QueryConfig {query, file_path, case_insensitive})
+
     }
 
 }
@@ -23,9 +30,9 @@ pub fn run(config: QueryConfig) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
     let results = if config.case_insensitive {
-        search_case_insensitive(config.query, &contents)
+        search_case_insensitive(&config.query, &contents)
     } else {
-        search(config.query, &contents)
+        search(&config.query, &contents)
     };
     for line in results {
         println!("{line}");
